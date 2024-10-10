@@ -9,7 +9,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var movies: [Movie] = Array(repeating: Movie(), count: 10)
+    var movies: [Result] = []
     
     lazy var movieDBLabel: UILabel = {
        let label = UILabel()
@@ -34,6 +34,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupLayout()
+        apiRequest()
+    }
+    
+    func apiRequest() {
+        NetworkManager.shared.loadMovie { result in
+            self.movies = result.results
+            self.movieTableView.reloadData()
+        }
     }
 
     func setupLayout() {
@@ -63,7 +71,9 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! MovieTableViewCell
         let movie = movies[indexPath.row]
-        cell.posterImageView.image = movie.poster
+        NetworkManager.shared.loadImage(posterPath: movie.posterPath) { image in
+            cell.posterImageView.image = image
+        }
         cell.titleLabel.text = movie.title
         return cell
     }

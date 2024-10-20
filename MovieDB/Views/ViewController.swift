@@ -33,8 +33,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        setupLayout()
         apiRequest()
+        setupLayout()
     }
     
     func apiRequest() {
@@ -51,7 +51,7 @@ class ViewController: UIViewController {
         }
         
         NSLayoutConstraint.activate([
-            movieDBLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 41),
+            movieDBLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             movieDBLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             movieDBLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             
@@ -76,5 +76,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
         cell.titleLabel.text = movie.title
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let movie = movies[indexPath.row]
+        let vc = MovieDetailViewController()
+        vc.movieId = movie.id
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

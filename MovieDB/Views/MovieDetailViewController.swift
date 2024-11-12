@@ -24,6 +24,13 @@ class MovieDetailViewController: UIViewController {
         return imageView
     }()
     
+    private lazy var starStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 10
+        return stack
+    }()
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -43,6 +50,7 @@ class MovieDetailViewController: UIViewController {
         let label = UILabel()
         label.textAlignment = .left
         label.font = .systemFont(ofSize: 15, weight: .medium)
+        label.numberOfLines = 0
         return label
     }()
    
@@ -55,14 +63,46 @@ class MovieDetailViewController: UIViewController {
                 self.posterImageView.image = result
             }
             self.titleLabel.text = movieDetail.title
-            self.releaseDateLabel.text = "Release date " + releaseDateFormat(stringDate: movieDetail.releaseDate)
+            self.releaseDateLabel.text = "Release " + releaseDateFormat(stringDate: movieDetail.releaseDate)
+            self.setRatingStar(rating: movieDetail.voteAverage ?? 0)
+        }
+    }
+    
+    func releaseDateFormat(stringDate: String?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        guard let stringDate = stringDate else { return "Something went wrong" }
+        guard let date = dateFormatter.date(from: stringDate) else { return "unknown" }
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "MMM d, yyyy"
+        return outputFormatter.string(from: date)
+    }
+    
+    private func setRatingStar(rating: Double) {
+        let rating = rating / 2
+        let fullStar = UIImage(systemName: "star.fill")
+        let star = UIImage(systemName: "star")
+        let halfStar = UIImage(systemName: "star.leadinghalf.filled")
+        for i in 0..<5 {
+            let image = UIImageView()
+            image.tintColor = .systemYellow
+            if rating >= Double(i) {
+                image.image = fullStar
+            }
+            else if rating >= Double(i) - 0.5 {
+                image.image = halfStar
+            }
+            else {
+                image.image = star
+            }
+            starStackView.addArrangedSubview(image)
         }
     }
     
     private func setupLayout() {
         view.backgroundColor = .systemBackground
         view.addSubview(scrollView)
-        [posterImageView, titleLabel, releaseDateLabel].forEach { view in
+        [posterImageView, titleLabel, releaseDateLabel, starStackView].forEach { view in
             scrollView.addSubview(view)
         }
         
@@ -87,16 +127,13 @@ class MovieDetailViewController: UIViewController {
         releaseDateLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview().inset(22)
+            make.width.equalToSuperview().dividedBy(2.24)
         }
-    }
-    
-    func releaseDateFormat(stringDate: String?) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        guard let stringDate = stringDate else { return "Something went wrong" }
-        guard let date = dateFormatter.date(from: stringDate) else { return "unknown" }
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "MMM d, yyyy"
-        return outputFormatter.string(from: date)
+        
+        starStackView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(20)
+            make.leading.equalTo(releaseDateLabel.snp.trailing).offset(22)
+            make.trailing.equalToSuperview().offset(22)
+        }
     }
 }

@@ -24,9 +24,16 @@ class MovieDetailViewController: UIViewController {
         return imageView
     }()
     
-    private lazy var starStackView: UIStackView = {
+    private lazy var ratingStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
+        stack.spacing = 10
+        return stack
+    }()
+    
+    private lazy var leftStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
         stack.spacing = 10
         return stack
     }()
@@ -53,6 +60,21 @@ class MovieDetailViewController: UIViewController {
         label.numberOfLines = 0
         return label
     }()
+    
+    private lazy var voteAvgLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 15, weight: .medium)
+        return label
+    }()
+    
+    private lazy var voteCountLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 10, weight: .medium)
+        label.textColor = .gray
+        return label
+    }()
    
     func apiRequest() {
         guard let movieId else { return }
@@ -65,6 +87,9 @@ class MovieDetailViewController: UIViewController {
             self.titleLabel.text = movieDetail.title
             self.releaseDateLabel.text = "Release " + releaseDateFormat(stringDate: movieDetail.releaseDate)
             self.setRatingStar(rating: movieDetail.voteAverage ?? 0)
+            guard let voteCount = movieDetail.voteCount else { return }
+            self.voteCountLabel.text = voteCount > 1000 ? "\((voteCount)/1000)K" : "\(voteCount)"
+            self.voteAvgLabel.text = "\(String(format: "%.1f",movieDetail.voteAverage ?? 0))/10"
         }
     }
     
@@ -95,14 +120,17 @@ class MovieDetailViewController: UIViewController {
             else {
                 image.image = star
             }
-            starStackView.addArrangedSubview(image)
+            ratingStackView.addArrangedSubview(image)
         }
     }
     
     private func setupLayout() {
         view.backgroundColor = .systemBackground
+        leftStackView.addArrangedSubview(releaseDateLabel)
+        leftStackView.addArrangedSubview(voteAvgLabel)
+        leftStackView.addArrangedSubview(voteCountLabel)
         view.addSubview(scrollView)
-        [posterImageView, titleLabel, releaseDateLabel, starStackView].forEach { view in
+        [posterImageView, titleLabel, leftStackView, ratingStackView].forEach { view in
             scrollView.addSubview(view)
         }
         
@@ -124,13 +152,13 @@ class MovieDetailViewController: UIViewController {
             make.width.equalTo(posterImageView.snp.width)
         }
         
-        releaseDateLabel.snp.makeConstraints { make in
+        leftStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview().inset(22)
             make.width.equalToSuperview().dividedBy(2.24)
         }
         
-        starStackView.snp.makeConstraints { make in
+        ratingStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalTo(releaseDateLabel.snp.trailing).offset(22)
             make.trailing.equalToSuperview().offset(22)

@@ -74,4 +74,21 @@ class NetworkManager {
         }
         task.resume()
     }
+    
+    func loadGenres(completion: @escaping (Genres)->()) {
+        urlComponents.path = "/3/genre/movie/list"
+        guard let url = urlComponents.url else { return }
+        DispatchQueue.global().async {
+            let task = self.session.dataTask(with: url) { data, _, error in
+                if let error { print(error) }
+                guard let data = data else { return }
+                if let genres = try? JSONDecoder().decode(Genres.self, from: data) {
+                    DispatchQueue.main.async {
+                        completion(genres)
+                    }
+                }
+            }
+            task.resume()
+        }
+    }
 }

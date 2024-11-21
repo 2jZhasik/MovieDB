@@ -11,7 +11,7 @@ class GenreCollectionViewCell: UICollectionViewCell {
 
     lazy var genreLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 10)
+        label.font = .systemFont(ofSize: 15)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -19,9 +19,6 @@ class GenreCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBlue
-        contentView.layer.cornerRadius = 20
-        contentView.clipsToBounds = true
         setupUI()
     }
     
@@ -29,10 +26,19 @@ class GenreCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configureLabel(font: UIFont) {
+        self.genreLabel.font = font
+    }
+    
     private func setupUI() {
-        addSubview(genreLabel)
+        backgroundColor = .systemBlue
+        contentView.addSubview(genreLabel)
+        clipsToBounds = true
+        layer.cornerRadius = 11
         
         genreLabel.snp.makeConstraints { make in
+            make.left.right.equalToSuperview().inset(12)
+            make.top.bottom.equalToSuperview().inset(4)
             make.centerY.equalToSuperview()
             make.centerX.equalToSuperview()
         }

@@ -55,7 +55,7 @@ class MovieTableViewCell: UITableViewCell {
             
             posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 33),
             posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -33),
-            posterImageView.heightAnchor.constraint(equalToConstant: 424),
+            posterImageView.heightAnchor.constraint(equalToConstant: 450),
         ])
     }
 }

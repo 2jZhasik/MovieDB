@@ -1,8 +1,8 @@
 //
-//  Genre.swift
+//  Genres.swift
 //  MovieDB
 //
-//  Created by Елжас Бегланулы on 20.11.2024.
+//  Created by Елжас Бегланулы on 21.11.2024.
 //
 
 import Foundation

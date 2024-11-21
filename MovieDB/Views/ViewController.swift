@@ -9,8 +9,9 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    var allMovies: [Result] = []
     var movies: [Result] = []
-    var genres: [Genre] = []
+    var genres: [Genre] = [.init(id: 1, name: "All")]
     
     lazy var movieDBLabel: UILabel = {
         let label = UILabel()
@@ -47,22 +48,33 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        apiRequestGenre()
         apiRequest()
         setupLayout()
     }
     
-    func apiRequest() {
+    private func apiRequest() {
         NetworkManager.shared.loadMovie { [weak self] result in
+            self?.allMovies = result.results
             self?.movies = result.results
             self?.movieTableView.reloadData()
         }
+        
+        NetworkManager.shared.loadGenres { [weak self] result in
+            result.genres.forEach { genre in
+                self?.genres.append(genre)
+            }
+            self?.genreCollectionView.reloadData()
+        }
     }
     
-    func apiRequestGenre() {
-        NetworkManager.shared.loadGenres { [weak self] result in
-            self?.genres = result.genres
-            self?.genreCollectionView.reloadData()
+    private func obtainMovieList(with genreId: Int) {
+        guard genreId != 1 else {
+            movies = allMovies
+            return
+        }
+        
+        movies = allMovies.filter { movies in
+            movies.genreIDS.contains(genreId)
         }
     }
 
@@ -130,6 +142,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    
+        obtainMovieList(with: genres[indexPath.row].id!)
+        movieTableView.reloadData()
     }
 }

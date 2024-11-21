@@ -9,10 +9,17 @@ import UIKit
 
 class GenreCollectionViewCell: UICollectionViewCell {
 
+    override var isSelected: Bool {
+        didSet {
+            backgroundColor = isSelected ? .systemBlue : .systemGray6
+            genreLabel.textColor = isSelected ? .white : .black
+        }
+    }
+    
     lazy var genreLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 15)
-        label.textColor = .white
+        label.textColor = .black
         label.textAlignment = .center
         return label
     }()
@@ -30,12 +37,14 @@ class GenreCollectionViewCell: UICollectionViewCell {
         self.genreLabel.font = font
     }
     
+    func configureBackgroundColor(color: UIColor) {
+        self.backgroundColor = color
+    }
+    
     private func setupUI() {
-        backgroundColor = .systemBlue
         contentView.addSubview(genreLabel)
         clipsToBounds = true
         layer.cornerRadius = 11
-        
         genreLabel.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(12)
             make.top.bottom.equalToSuperview().inset(4)

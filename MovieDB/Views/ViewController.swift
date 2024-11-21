@@ -138,6 +138,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDa
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCollectionViewCell
         cell.genreLabel.text = genres[indexPath.row].name
         cell.configureLabel(font: .systemFont(ofSize: 18, weight: .regular))
+        cell.configureBackgroundColor(color: .systemGray6)
         return cell
     }
     

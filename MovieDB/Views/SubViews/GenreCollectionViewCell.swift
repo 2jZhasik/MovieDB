@@ -8,17 +8,25 @@
 import UIKit
 
 class GenreCollectionViewCell: UICollectionViewCell {
+        
+    override var isSelected: Bool {
+        didSet {
+            backgroundColor = isSelected ? .systemBlue : .systemGray6
+            genreLabel.textColor = isSelected ? .systemBackground : .label
+        }
+    }
     
     lazy var genreLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 15)
-        label.textColor = .black
+        label.textColor = .label
         label.textAlignment = .center
         return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .systemGray6
         setupUI()
     }
     
@@ -28,10 +36,6 @@ class GenreCollectionViewCell: UICollectionViewCell {
     
     func configureLabel(font: UIFont) {
         self.genreLabel.font = font
-    }
-    
-    func configureBackgroundColor(color: UIColor) {
-        self.backgroundColor = color
     }
     
     private func setupUI() {

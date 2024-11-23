@@ -20,6 +20,7 @@ class ViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 36,weight: .bold)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = .clear
         return label
     }()
     
@@ -36,7 +37,7 @@ class ViewController: UIViewController {
     lazy var genreCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 22, bottom: 10, right: 16)
         layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
@@ -49,6 +50,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        navigationItem.titleView = movieDBLabel
         apiRequest()
         setupLayout()
     }
@@ -81,19 +83,13 @@ class ViewController: UIViewController {
 
     func setupLayout() {
         
-        [movieDBLabel, genreCollectionView, movieTableView].forEach {
+        [genreCollectionView, movieTableView].forEach {
             view.addSubview($0)
         }
         
-        movieDBLabel.snp.makeConstraints { make in
+        genreCollectionView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.equalTo(view.safeAreaLayoutGuide.snp.leading)
-            make.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing)
-        }
-        
-        genreCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(movieDBLabel.snp.bottom).offset(10)
-            make.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).inset(6)
             make.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing)
             make.height.equalTo(60)
         }
@@ -138,22 +134,11 @@ extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDa
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCollectionViewCell
         cell.genreLabel.text = genres[indexPath.row].name
         cell.configureLabel(font: .systemFont(ofSize: 18, weight: .regular))
-        cell.configureBackgroundColor(color: .systemGray6)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         obtainMovieList(with: genres[indexPath.row].id!)
         movieTableView.reloadData()
-    }
-}
-
-extension GenreCollectionViewCell {
-    
-    override var isSelected: Bool {
-        didSet {
-            backgroundColor = isSelected ? .systemBlue : .systemGray6
-            genreLabel.textColor = isSelected ? .white : .black
-        }
     }
 }

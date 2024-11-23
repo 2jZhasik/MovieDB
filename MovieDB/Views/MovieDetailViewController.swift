@@ -16,6 +16,9 @@ class MovieDetailViewController: UIViewController {
 
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
+        scroll.showsHorizontalScrollIndicator = false
+        scroll.showsVerticalScrollIndicator = false
+        scroll.contentInset = UIEdgeInsets(top: 12, left: 25, bottom: 20, right: 20)
         return scroll
     }()
     
@@ -29,6 +32,7 @@ class MovieDetailViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(GenreCollectionViewCell.self, forCellWithReuseIdentifier: "GenreCell")
+        collectionView.allowsSelection = false
         return collectionView
     }()
     
@@ -40,6 +44,7 @@ class MovieDetailViewController: UIViewController {
     
     private lazy var ratingStackView: UIStackView = {
         let stack = UIStackView()
+        stack.distribution = .fillEqually
         stack.axis = .horizontal
         stack.spacing = 10
         return stack
@@ -98,15 +103,14 @@ class MovieDetailViewController: UIViewController {
         label.textColor = .gray
         return label
     }()
+    
+    private var contentView = UIView()
    
     func apiRequest() {
         guard let movieId else { return }
         NetworkManager.shared.loadMovieDetail(movieId: movieId) { [self] result in
             self.movieDetail = result
             guard let movieDetail = self.movieDetail else { return }
-//            NetworkManager.shared.loadImage(posterPath: movieDetail.posterPath!) { result in
-//                self.posterImageView.image = result
-//            }
             let imageUrl = NetworkManager.shared.baseImageUrl.appending(movieDetail.posterPath!)
             self.posterImageView.kf.setImage(with: URL(string: imageUrl))
             self.genres = movieDetail.genres
@@ -154,6 +158,7 @@ class MovieDetailViewController: UIViewController {
     private func setupLayout() {
         view.backgroundColor = .systemBackground
         view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         [releaseDateLabel, genreCollectionView].forEach { view in
             leftStackView.addArrangedSubview(view)
         }
@@ -161,23 +166,30 @@ class MovieDetailViewController: UIViewController {
             rightStackView.addArrangedSubview(view)
         }
         [posterImageView, titleLabel, leftStackView, rightStackView].forEach { view in
-            scrollView.addSubview(view)
+            contentView.addSubview(view)
         }
+                
         scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.bottom.left.right.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalTo(view.frame.width)
+            make.centerX.equalTo(view.snp.centerX)
         }
         
         posterImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(12)
+            make.top.equalToSuperview()
             make.centerX.equalToSuperview()
             make.height.equalTo(450)
-            make.width.equalToSuperview().inset(20)
+            make.width.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(posterImageView.snp.bottom).offset(10)
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(10)
             make.width.equalTo(posterImageView.snp.width)
         }
         
@@ -191,14 +203,17 @@ class MovieDetailViewController: UIViewController {
         
         leftStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.leading.equalToSuperview().inset(22)
-            make.width.equalToSuperview().dividedBy(2.24)
+            make.leading.equalToSuperview()
+            make.width.equalToSuperview().dividedBy(2.2)
+            make.bottom.equalToSuperview()
         }
         
         rightStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.leading.equalTo(leftStackView.snp.trailing).offset(22)
-            make.trailing.equalToSuperview().offset(22)
+            make.leading.equalTo(leftStackView.snp.trailing)
+            make.trailing.equalToSuperview()
+            make.width.equalToSuperview().dividedBy(2.3)
+            make.bottom.equalToSuperview()
         }
     }
 }
@@ -212,7 +227,6 @@ extension MovieDetailViewController: UICollectionViewDelegateFlowLayout, UIColle
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCollectionViewCell
         cell.genreLabel.text = genres[indexPath.row].name
         cell.configureLabel(font: .systemFont(ofSize: 14, weight: .regular))
-        cell.configureBackgroundColor(color: .systemGray6)
         return cell
     }
 }

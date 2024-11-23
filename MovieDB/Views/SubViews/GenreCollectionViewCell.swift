@@ -8,13 +8,6 @@
 import UIKit
 
 class GenreCollectionViewCell: UICollectionViewCell {
-
-    override var isSelected: Bool {
-        didSet {
-            backgroundColor = isSelected ? .systemBlue : .systemGray6
-            genreLabel.textColor = isSelected ? .white : .black
-        }
-    }
     
     lazy var genreLabel: UILabel = {
         let label = UILabel()

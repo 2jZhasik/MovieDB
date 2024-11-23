@@ -12,10 +12,24 @@ class MovieDetailViewController: UIViewController {
     
     var movieId: Int?
     var movieDetail: MovieDetail?
-    
+    private lazy var genres: [Genre] = []
+
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         return scroll
+    }()
+    
+    lazy var genreCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 16)
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.register(GenreCollectionViewCell.self, forCellWithReuseIdentifier: "GenreCell")
+        return collectionView
     }()
     
     private lazy var posterImageView: UIImageView = {
@@ -33,6 +47,15 @@ class MovieDetailViewController: UIViewController {
     
     private lazy var leftStackView: UIStackView = {
         let stack = UIStackView()
+        stack.backgroundColor = .systemBackground
+        stack.axis = .vertical
+        stack.spacing = 10
+        return stack
+    }()
+    
+    private lazy var rightStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.backgroundColor = .systemBackground
         stack.axis = .vertical
         stack.spacing = 10
         return stack
@@ -81,15 +104,19 @@ class MovieDetailViewController: UIViewController {
         NetworkManager.shared.loadMovieDetail(movieId: movieId) { [self] result in
             self.movieDetail = result
             guard let movieDetail = self.movieDetail else { return }
-            NetworkManager.shared.loadImage(posterPath: movieDetail.posterPath!) { result in
-                self.posterImageView.image = result
-            }
+//            NetworkManager.shared.loadImage(posterPath: movieDetail.posterPath!) { result in
+//                self.posterImageView.image = result
+//            }
+            let imageUrl = NetworkManager.shared.baseImageUrl.appending(movieDetail.posterPath!)
+            self.posterImageView.kf.setImage(with: URL(string: imageUrl))
+            self.genres = movieDetail.genres
             self.titleLabel.text = movieDetail.title
             self.releaseDateLabel.text = "Release " + releaseDateFormat(stringDate: movieDetail.releaseDate)
             self.setRatingStar(rating: movieDetail.voteAverage ?? 0)
             guard let voteCount = movieDetail.voteCount else { return }
             self.voteCountLabel.text = voteCount > 1000 ? "\((voteCount)/1000)K" : "\(voteCount)"
             self.voteAvgLabel.text = "\(String(format: "%.1f",movieDetail.voteAverage ?? 0))/10"
+            genreCollectionView.reloadData()
         }
     }
     
@@ -126,14 +153,16 @@ class MovieDetailViewController: UIViewController {
     
     private func setupLayout() {
         view.backgroundColor = .systemBackground
-        leftStackView.addArrangedSubview(releaseDateLabel)
-        leftStackView.addArrangedSubview(voteAvgLabel)
-        leftStackView.addArrangedSubview(voteCountLabel)
         view.addSubview(scrollView)
-        [posterImageView, titleLabel, leftStackView, ratingStackView].forEach { view in
+        [releaseDateLabel, genreCollectionView].forEach { view in
+            leftStackView.addArrangedSubview(view)
+        }
+        [ratingStackView, voteAvgLabel, voteCountLabel].forEach { view in
+            rightStackView.addArrangedSubview(view)
+        }
+        [posterImageView, titleLabel, leftStackView, rightStackView].forEach { view in
             scrollView.addSubview(view)
         }
-        
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide.snp.edges)
         }
@@ -141,8 +170,8 @@ class MovieDetailViewController: UIViewController {
         posterImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().inset(12)
             make.centerX.equalToSuperview()
-            make.height.equalTo(424)
-            make.width.equalTo(309)
+            make.height.equalTo(450)
+            make.width.equalToSuperview().inset(20)
         }
         
         titleLabel.snp.makeConstraints { make in
@@ -152,16 +181,38 @@ class MovieDetailViewController: UIViewController {
             make.width.equalTo(posterImageView.snp.width)
         }
         
+        genreCollectionView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+        }
+        
+        voteCountLabel.snp.makeConstraints { make in
+            make.top.equalTo(voteAvgLabel.snp.bottom)
+        }
+        
         leftStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview().inset(22)
             make.width.equalToSuperview().dividedBy(2.24)
         }
         
-        ratingStackView.snp.makeConstraints { make in
+        rightStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.leading.equalTo(releaseDateLabel.snp.trailing).offset(22)
+            make.leading.equalTo(leftStackView.snp.trailing).offset(22)
             make.trailing.equalToSuperview().offset(22)
         }
+    }
+}
+
+extension MovieDetailViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        genres.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GenreCell", for: indexPath) as! GenreCollectionViewCell
+        cell.genreLabel.text = genres[indexPath.row].name
+        cell.configureLabel(font: .systemFont(ofSize: 14, weight: .regular))
+        cell.configureBackgroundColor(color: .systemGray6)
+        return cell
     }
 }

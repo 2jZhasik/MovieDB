@@ -6,13 +6,14 @@
 //
 
 import UIKit
+import Kingfisher
 
 class ViewController: UIViewController {
     
-    var allMovies: [Result] = []
-    var movies: [Result] = []
-    var genres: [Genre] = [.init(id: 1, name: "All")]
-    
+    private var allMovies: [Result] = []
+    private lazy var movies: [Result] = []
+    private lazy var genres: [Genre] = [.init(id: 1, name: "All")]
+
     lazy var movieDBLabel: UILabel = {
         let label = UILabel()
         label.text = "MovieDB"
@@ -51,7 +52,7 @@ class ViewController: UIViewController {
         apiRequest()
         setupLayout()
     }
-    
+
     private func apiRequest() {
         NetworkManager.shared.loadMovie { [weak self] result in
             self?.allMovies = result.results
@@ -114,9 +115,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! MovieTableViewCell
         let movie = movies[indexPath.row]
-        NetworkManager.shared.loadImage(posterPath: movie.posterPath) { image in
-            cell.posterImageView.image = image
-        }
+        let imageUrl = NetworkManager.shared.baseImageUrl.appending(movie.posterPath)
+        cell.posterImageView.kf.setImage(with: URL(string: imageUrl))
         cell.titleLabel.text = movie.title
         return cell
     }
@@ -145,5 +145,15 @@ extension ViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDa
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         obtainMovieList(with: genres[indexPath.row].id!)
         movieTableView.reloadData()
+    }
+}
+
+extension GenreCollectionViewCell {
+    
+    override var isSelected: Bool {
+        didSet {
+            backgroundColor = isSelected ? .systemBlue : .systemGray6
+            genreLabel.textColor = isSelected ? .white : .black
+        }
     }
 }

@@ -11,14 +11,14 @@ import SnapKit
 class MovieDetailViewController: UIViewController {
     
     var movieId: Int?
-    var movieDetail: MovieDetail?
+    private var movieDetail: MovieDetail?
     private lazy var genres: [Genre] = []
 
     private lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.showsHorizontalScrollIndicator = false
         scroll.showsVerticalScrollIndicator = false
-        scroll.contentInset = UIEdgeInsets(top: 12, left: 25, bottom: 20, right: 20)
+        scroll.contentInset = UIEdgeInsets(top: 12, left: 25, bottom: view.safeAreaInsets.bottom + 20, right: 20)
         return scroll
     }()
     
@@ -38,7 +38,7 @@ class MovieDetailViewController: UIViewController {
     
     private lazy var posterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
@@ -63,6 +63,14 @@ class MovieDetailViewController: UIViewController {
         stack.backgroundColor = .systemBackground
         stack.axis = .vertical
         stack.spacing = 10
+        return stack
+    }()
+    
+    private lazy var linkStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.backgroundColor = .systemBackground
+        stack.axis = .horizontal
+        stack.distribution = .equalSpacing
         return stack
     }()
     
@@ -104,22 +112,44 @@ class MovieDetailViewController: UIViewController {
         return label
     }()
     
+    private var imdbImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "imdb")
+        imageView.tintColor = .systemGray
+        return imageView
+    }()
+    
+    private var youtubeImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "youtube")
+        imageView.tintColor = .systemGray
+        return imageView
+    }()
+    
+    private var facebookImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "facebook")
+        imageView.tintColor = .systemGray
+        return imageView
+    }()
+    
     private var contentView = UIView()
    
     func apiRequest() {
         guard let movieId else { return }
-        NetworkManager.shared.loadMovieDetail(movieId: movieId) { [self] result in
-            self.movieDetail = result
-            guard let movieDetail = self.movieDetail else { return }
+        NetworkManager.shared.loadMovieDetail(movieId: movieId) { [weak self] result in
+            guard let self = self else { return }
+            movieDetail = result
+            guard let movieDetail = movieDetail else { return }
             let imageUrl = NetworkManager.shared.baseImageUrl.appending(movieDetail.posterPath!)
-            self.posterImageView.kf.setImage(with: URL(string: imageUrl))
-            self.genres = movieDetail.genres
-            self.titleLabel.text = movieDetail.title
-            self.releaseDateLabel.text = "Release " + releaseDateFormat(stringDate: movieDetail.releaseDate)
-            self.setRatingStar(rating: movieDetail.voteAverage ?? 0)
+            posterImageView.kf.setImage(with: URL(string: imageUrl))
+            genres = movieDetail.genres
+            titleLabel.text = movieDetail.title
+            releaseDateLabel.text = "Release " + (releaseDateFormat(stringDate: movieDetail.releaseDate))
+            setRatingStar(rating: movieDetail.voteAverage ?? 0)
             guard let voteCount = movieDetail.voteCount else { return }
-            self.voteCountLabel.text = voteCount > 1000 ? "\((voteCount)/1000)K" : "\(voteCount)"
-            self.voteAvgLabel.text = "\(String(format: "%.1f",movieDetail.voteAverage ?? 0))/10"
+            voteCountLabel.text = voteCount > 1000 ? "\((voteCount)/1000)K" : "\(voteCount)"
+            voteAvgLabel.text = "\(String(format: "%.1f",movieDetail.voteAverage ?? 0))/10"
             genreCollectionView.reloadData()
         }
     }
@@ -165,13 +195,15 @@ class MovieDetailViewController: UIViewController {
         [ratingStackView, voteAvgLabel, voteCountLabel].forEach { view in
             rightStackView.addArrangedSubview(view)
         }
-        [posterImageView, titleLabel, leftStackView, rightStackView].forEach { view in
+        [imdbImageView, youtubeImageView, facebookImageView].forEach { view in
+            linkStackView.addArrangedSubview(view)
+        }
+        [posterImageView, titleLabel, leftStackView, rightStackView, linkStackView].forEach { view in
             contentView.addSubview(view)
         }
                 
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
-            make.bottom.left.right.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -180,10 +212,12 @@ class MovieDetailViewController: UIViewController {
             make.centerX.equalTo(view.snp.centerX)
         }
         
+//        let posterHeight = view.bounds.height * 0.6
+        
         posterImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.centerX.equalToSuperview()
-            make.height.equalTo(450)
+            make.height.equalTo(460)
             make.width.equalToSuperview()
         }
         
@@ -205,7 +239,6 @@ class MovieDetailViewController: UIViewController {
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview()
             make.width.equalToSuperview().dividedBy(2.2)
-            make.bottom.equalToSuperview()
         }
         
         rightStackView.snp.makeConstraints { make in
@@ -213,7 +246,46 @@ class MovieDetailViewController: UIViewController {
             make.leading.equalTo(leftStackView.snp.trailing)
             make.trailing.equalToSuperview()
             make.width.equalToSuperview().dividedBy(2.3)
+        }
+        
+        imdbImageView.snp.makeConstraints { make in
+            make.width.equalTo(87)
+            make.height.equalTo(44)
+        }
+        
+        youtubeImageView.snp.makeConstraints { make in
+            make.width.equalTo(63)
+            make.height.equalTo(44)
+        }
+        
+        facebookImageView.snp.makeConstraints { make in
+            make.width.equalTo(44)
+            make.height.equalTo(44)
+        }
+        
+        linkStackView.snp.makeConstraints { make in
+            make.top.equalTo(leftStackView.snp.bottom).offset(20)
+            make.leading.trailing.equalToSuperview().inset(30)
             make.bottom.equalToSuperview()
+        }
+        
+        let tapGR = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
+        youtubeImageView.addGestureRecognizer(tapGR)
+        youtubeImageView.isUserInteractionEnabled = true
+    }
+    
+    @objc func imageTapped() {
+        guard let movieId else { return }
+        NetworkManager.shared.loadVideos(movieId: movieId) { videos in
+            let youtubeVideos = videos.filter { video in
+                if let site = video.site {
+                    site.contains("YouTube")
+                } else { .init() }
+            }
+            guard let key = youtubeVideos.first?.key else { return }
+            let urlString = "https://www.youtube.com/watch?v=" + key
+            guard let url = URL(string: urlString) else { return }
+            UIApplication.shared.open(url)
         }
     }
 }

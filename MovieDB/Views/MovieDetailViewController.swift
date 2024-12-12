@@ -269,21 +269,64 @@ class MovieDetailViewController: UIViewController {
             make.bottom.equalToSuperview()
         }
         
-        let tapGR = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
+        let tapGR = UITapGestureRecognizer(target: self, action: #selector(imageTappedYouTube))
         youtubeImageView.addGestureRecognizer(tapGR)
         youtubeImageView.isUserInteractionEnabled = true
+        let tapGR2 = UITapGestureRecognizer(target: self, action: #selector(imageTappedExternal))
+        tapGR2.name = "imdb"
+        let tapGR3 = UITapGestureRecognizer(target: self, action: #selector(imageTappedExternal))
+        tapGR3.name = "facebook"
+        imdbImageView.addGestureRecognizer(tapGR2)
+        imdbImageView.isUserInteractionEnabled = true
+        facebookImageView.addGestureRecognizer(tapGR3)
+        facebookImageView.isUserInteractionEnabled = true
     }
     
-    @objc func imageTapped() {
-        guard let movieId else { return }
+    @objc func imageTappedYouTube() {
+        guard let movieId = movieId else { return }
         NetworkManager.shared.loadVideos(movieId: movieId) { videos in
             let youtubeVideos = videos.filter { video in
-                if let site = video.site {
-                    site.contains("YouTube")
-                } else { .init() }
+                if let site = video.site, let type = video.type {
+                    return type.contains("Trailer") && site.contains("YouTube")
+                } else {
+                    return false
+                }
             }
             guard let key = youtubeVideos.first?.key else { return }
             let urlString = "https://www.youtube.com/watch?v=" + key
+            guard let url = URL(string: urlString) else { return }
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    @objc func imageTappedExternal(_ gesture: UITapGestureRecognizer) {
+        guard let name = gesture.name, let movieId = movieId else { return }
+        
+        NetworkManager.shared.loadExternalIDs(movieId: movieId) { externalId in
+            let urlString: String
+            if name == "imdb" {
+                guard let link = externalId.imdbID else {
+                    print("No IMDb ID found")
+                    let ac = UIAlertController(title: "Error", message: "Imdb not found", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(ac, animated: true)
+                    return
+                }
+                urlString = "https://www.imdb.com/title/" + link
+            } else if name == "facebook" {
+                guard let link = externalId.facebookID else {
+                    print("No Facebook ID found")
+                    let ac = UIAlertController(title: "Error", message: "Facebook not found", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(ac, animated: true)
+                    return
+                }
+                urlString = "https://www.facebook.com/" + link
+            } else {
+                print("Unknown gesture name")
+                return
+            }
+            
             guard let url = URL(string: urlString) else { return }
             UIApplication.shared.open(url)
         }

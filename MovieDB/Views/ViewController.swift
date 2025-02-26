@@ -7,17 +7,20 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 class ViewController: UIViewController {
     
     private var allMovies: [Result] = []
     private lazy var movies: [Result] = []
     private lazy var genres: [Genre] = [.init(id: 1, name: "All")]
+    private var titleLabelYPosition: Constraint!
 
     lazy var movieDBLabel: UILabel = {
         let label = UILabel()
         label.text = "MovieDB"
-        label.font = UIFont.systemFont(ofSize: 36,weight: .bold)
+        label.alpha = 0
+        label.font = UIFont.systemFont(ofSize: 42,weight: .bold)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         label.backgroundColor = .clear
@@ -47,12 +50,43 @@ class ViewController: UIViewController {
         return collectionView
     }()
     
+    lazy var containerView = UIView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.titleView = movieDBLabel
+//        navigationItem.titleView = movieDBLabel
         apiRequest()
         setupLayout()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        animate()
+    }
+    
+    private func animate() {
+        //title
+        UIView.animate(withDuration: 0.5, delay: 0.3) {
+            self.movieDBLabel.alpha = 1
+        } completion: { _ in
+            UIView.animate(withDuration: 0.7, delay: 0.3) {
+                self.movieDBLabel.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
+            } completion: { _ in
+                UIView.animate(withDuration: 0.45, delay: 0.3, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8, options: .curveEaseIn) {
+                    self.invokeAnimatedTitleLableUp()
+                } completion: { _ in
+                    UIView.animate(withDuration: 0.5, delay: 0.2) {
+                        self.containerView.alpha = 1
+                    }
+                }
+            }
+        }
+    }
+    
+    private func invokeAnimatedTitleLableUp() {
+        titleLabelYPosition.update(offset: -(view.safeAreaLayoutGuide.layoutFrame.size.height/2 - 16))
+        view.layoutSubviews()
     }
 
     private func apiRequest() {
@@ -82,15 +116,25 @@ class ViewController: UIViewController {
     }
 
     func setupLayout() {
-        
+        containerView.alpha = 0
         [genreCollectionView, movieTableView].forEach {
-            view.addSubview($0)
+            containerView.addSubview($0)
+        }
+        view.addSubview(containerView)
+        view.addSubview(movieDBLabel)
+        
+        movieDBLabel.snp.makeConstraints { make in
+            titleLabelYPosition = make.centerY.equalToSuperview().constraint
+            make.center.equalToSuperview()
+        }
+        
+        containerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(8)
+            make.left.right.bottom.equalToSuperview()
         }
         
         genreCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.leading.equalTo(view.safeAreaLayoutGuide.snp.leading)
-            make.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing)
+            make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(60)
         }
         

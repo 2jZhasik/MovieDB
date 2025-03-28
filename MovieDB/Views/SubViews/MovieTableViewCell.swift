@@ -6,12 +6,12 @@
 //
 
 import UIKit
+import SnapKit
 
 class MovieTableViewCell: UITableViewCell {
 
     lazy var posterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 30
@@ -49,12 +49,10 @@ class MovieTableViewCell: UITableViewCell {
         stackView.addArrangedSubview(titleLabel)
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: contentView.topAnchor,constant: 15),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 33),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,constant: -33),
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -15),
             
-            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,constant: 33),
-            posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -33),
             posterImageView.heightAnchor.constraint(equalToConstant: 450),
         ])
     }

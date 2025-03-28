@@ -31,10 +31,13 @@ class NetworkManager {
             let task = self.session.dataTask(with: url) { data, _, error in
                 if let error { print(error) }
                 guard let data = data else { return }
-                if let movie = try? JSONDecoder().decode(Movie.self, from: data) {
+                do {
+                    let movie = try JSONDecoder().decode(Movie.self, from: data)
                     DispatchQueue.main.async {
                         completion(movie)
                     }
+                } catch {
+                    print("Decoding error: \(error)")
                 }
             }
             task.resume()

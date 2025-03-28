@@ -125,7 +125,7 @@ class ViewController: UIViewController {
         
         movieDBLabel.snp.makeConstraints { make in
             titleLabelYPosition = make.centerY.equalToSuperview().constraint
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
         }
         
         containerView.snp.makeConstraints { make in
@@ -155,8 +155,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! MovieTableViewCell
         let movie = movies[indexPath.row]
-        let imageUrl = NetworkManager.shared.baseImageUrl.appending(movie.posterPath)
-        cell.posterImageView.kf.setImage(with: URL(string: imageUrl))
+        if let posterPath = movie.posterPath, !posterPath.isEmpty {
+            let imageUrl = NetworkManager.shared.baseImageUrl.appending(posterPath)
+            cell.posterImageView.kf.setImage(with: URL(string: imageUrl))
+        } else {
+            cell.posterImageView.image = UIImage(named: "placeholder")
+        }
         cell.titleLabel.text = movie.title
         return cell
     }

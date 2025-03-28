@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		28A73E5E0F7ECF288DB087DD /* Pods_MovieDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ED43633800EAED2262C281D /* Pods_MovieDB.framework */; };
 		76642CB42CB3D407009AC5CF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76642CAC2CB3D407009AC5CF /* AppDelegate.swift */; };
 		76642CB52CB3D407009AC5CF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76642CB12CB3D407009AC5CF /* SceneDelegate.swift */; };
 		76642CB62CB3D407009AC5CF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76642CB22CB3D407009AC5CF /* ViewController.swift */; };
@@ -20,6 +19,7 @@
 		767B1A5C2CC659C000E82976 /* GenreCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767B1A5B2CC659C000E82976 /* GenreCollectionViewCell.swift */; };
 		7681E8F72CF34A88003B4F12 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7681E8F62CF34A88003B4F12 /* Video.swift */; };
 		7681E91F2CF48D2A003B4F12 /* ExternalIDS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7681E91E2CF48D2A003B4F12 /* ExternalIDS.swift */; };
+		76B10D652D8A2921001AA382 /* Pods_MovieDB.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76B10D642D8A2921001AA382 /* Pods_MovieDB.framework */; };
 		76C4C1222CEF952800D49D73 /* Genres.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C4C1212CEF952800D49D73 /* Genres.swift */; };
 		76E92CE82CC133A0005789EE /* MovieDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E92CE72CC133A0005789EE /* MovieDetailViewController.swift */; };
 		76E92CEB2CC1359F005789EE /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 76E92CEA2CC1359F005789EE /* SnapKit */; };
@@ -41,6 +41,8 @@
 		767B1A5B2CC659C000E82976 /* GenreCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreCollectionViewCell.swift; sourceTree = "<group>"; };
 		7681E8F62CF34A88003B4F12 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		7681E91E2CF48D2A003B4F12 /* ExternalIDS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalIDS.swift; sourceTree = "<group>"; };
+		76B10D602D8A28FE001AA382 /* Kingfisher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Kingfisher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		76B10D642D8A2921001AA382 /* Pods_MovieDB.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_MovieDB.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		76C4C1212CEF952800D49D73 /* Genres.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genres.swift; sourceTree = "<group>"; };
 		76E92CE72CC133A0005789EE /* MovieDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewController.swift; sourceTree = "<group>"; };
 		AFB215B220EF85CED7400F8B /* Pods-MovieDB.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MovieDB.debug.xcconfig"; path = "Target Support Files/Pods-MovieDB/Pods-MovieDB.debug.xcconfig"; sourceTree = "<group>"; };
@@ -53,7 +55,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				76E92CEB2CC1359F005789EE /* SnapKit in Frameworks */,
-				28A73E5E0F7ECF288DB087DD /* Pods_MovieDB.framework in Frameworks */,
+				76B10D652D8A2921001AA382 /* Pods_MovieDB.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +65,8 @@
 		03574877A4CDF49A6CF41D9F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				76B10D642D8A2921001AA382 /* Pods_MovieDB.framework */,
+				76B10D602D8A28FE001AA382 /* Kingfisher.framework */,
 				3ED43633800EAED2262C281D /* Pods_MovieDB.framework */,
 			);
 			name = Frameworks;
@@ -313,6 +317,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -340,6 +345,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -141,8 +141,12 @@ class MovieDetailViewController: UIViewController {
             guard let self = self else { return }
             movieDetail = result
             guard let movieDetail = movieDetail else { return }
-            let imageUrl = NetworkManager.shared.baseImageUrl.appending(movieDetail.posterPath!)
-            posterImageView.kf.setImage(with: URL(string: imageUrl))
+            if let posterPath = movieDetail.posterPath, !posterPath.isEmpty {
+                        let imageUrl = NetworkManager.shared.baseImageUrl.appending(posterPath)
+                        posterImageView.kf.setImage(with: URL(string: imageUrl))
+                    } else {
+                        posterImageView.image = UIImage(named: "placeholder")
+                    }
             genres = movieDetail.genres
             titleLabel.text = movieDetail.title
             releaseDateLabel.text = "Release " + (releaseDateFormat(stringDate: movieDetail.releaseDate))
@@ -201,14 +205,13 @@ class MovieDetailViewController: UIViewController {
         [posterImageView, titleLabel, leftStackView, rightStackView, linkStackView].forEach { view in
             contentView.addSubview(view)
         }
-                
+        
         scrollView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
-        
+
         contentView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.equalTo(view.frame.width)
             make.centerX.equalTo(view.snp.centerX)
         }
         
@@ -231,21 +234,16 @@ class MovieDetailViewController: UIViewController {
             make.height.equalTo(40)
         }
         
-        voteCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(voteAvgLabel.snp.bottom)
-        }
-        
         leftStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview()
-            make.width.equalToSuperview().dividedBy(2.2)
+            make.width.equalToSuperview().multipliedBy(0.45)
         }
         
         rightStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.leading.equalTo(leftStackView.snp.trailing)
             make.trailing.equalToSuperview()
-            make.width.equalToSuperview().dividedBy(2.3)
+            make.width.equalToSuperview().multipliedBy(0.41)
         }
         
         imdbImageView.snp.makeConstraints { make in
